@@ -46,8 +46,8 @@ static void signal_handler(int sig)
 
 /*
  *********************************************************************************
- * setup():
- * Setup modules, with the values from config.h and set signal handlers
+ * setup_signal_handler():
+ * Setup signal handlers
  *********************************************************************************
  */
 void setup_signal_handler( void ){
@@ -66,7 +66,7 @@ void setup_signal_handler( void ){
 /*
  *********************************************************************************
  * setup():
- * Setup modules, with the values from config.h and set signal handlers
+ * Setup modules, with the values from the config
  *********************************************************************************
  */
 int setup( void )
