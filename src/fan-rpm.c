@@ -11,75 +11,90 @@
 #include <wiringPi.h>
 //#include "../wiringPi/wiringPi/wiringPi.h"
 
-void setRpmPin ( int pin );
-void setTicksPerRotation ( int ticks );
-void setTestInterval ( int ticks );
-
-int setupWiringPiRPM( void );
-int getRpm( void );
-
-double time_diff(struct timeval x , struct timeval y);
-
-
-// globalCounter:
-//  Global variable to count interrupts
-//  Should be declared volatile to make sure the compiler doesn't cache it.
-
-static volatile int globalCounter    = 0;
-static volatile int rpmPin           = 0;
-static volatile int rpmPinGPIO       = 0;
-static volatile int testInterval     = 25;
-static volatile int ticksPerRotation = 2;
-static volatile int ticks            = 0;
-static volatile int initRPM			 = 0;
-char cmd[50];
-
 /*
- * setRpmPin:
+ *********************************************************************************
+ * Setup variables and default values
  *********************************************************************************
  */
+static volatile int COUNTER            = 0;
+static volatile int RPM_PIN            = 0;
+static volatile int RPM_PIN_GPIO       = 0;
+static volatile int TEST_INTERVAL      = 25;
+static volatile int TICKS_PER_ROTATION = 2;
+static volatile int TICKS              = 0;
+static volatile int INIT_RPM		   = 0;
 
-void setRpmPin ( int pin )
+int 	setRpmPin ( int pin );
+int 	setTicksPerRotation ( int ticks );
+int 	setTestInterval ( int ticks );
+void 	interruptCounter (void);
+double 	time_diff(struct timeval x , struct timeval y);
+int 	setupWiringPiRPM( void );
+void 	pauseInterruptHandler(int pause);
+int 	getRpm( void );
+
+/*
+ *********************************************************************************
+ * setRpmPin():
+ *********************************************************************************
+ */
+int setRpmPin ( int pin )
 {
-	rpmPin = pin;
+	if(pin != 1){
+		return ( 1 );
+	}else{
+		RPM_PIN = pin;
+		return ( 0 );
+	}
 }
 
+
 /*
- * setTicksPerRotation:
+ *********************************************************************************
+ * setTicksPerRotation():
  *********************************************************************************
  */
-
-void setTicksPerRotation ( int ticks )
+int setTicksPerRotation ( int ticks )
 {
-	ticksPerRotation = ticks;
+	if(ticks % 2 != 0){
+		return ( 1 );
+	}else{
+		TICKS_PER_ROTATION = ticks;
+		return ( 0 );
+	}
 }
 
+
 /*
- * setTestInterval:
+ *********************************************************************************
+ * setTestInterval():
  *********************************************************************************
  */
-
-void setTestInterval ( int ticks )
+int setTestInterval ( int ticks )
 {
-	testInterval = ticks;
+	TEST_INTERVAL = ticks;
+	return ( 1 );
 }
 
+
 /*
- * interruptCounter:
+ *********************************************************************************
+ * interruptCounter():
+ * Count up the Interrupts
  *********************************************************************************
  */
-
 void interruptCounter (void)
 {
-	//printf("%d - ", ++globalCounter);
-	++globalCounter;
+	++COUNTER;
 }
 
+
 /*
- * time_diff:
+ *********************************************************************************
+ * time_diff():
+ * Calculate time difference in ms between 2 timeval
  *********************************************************************************
  */
-
 double time_diff(struct timeval x , struct timeval y)
 {
     double x_ms , y_ms , diff;
@@ -95,11 +110,10 @@ double time_diff(struct timeval x , struct timeval y)
 
 /*
  *********************************************************************************
- * setupWiringPi
+ * setupWiringPi():
+ * Setup wiringPi, RPM Pin and InterruptHandler
  *********************************************************************************
  */
-
-
 int setupWiringPiRPM( void )
 {
 
@@ -109,10 +123,10 @@ int setupWiringPiRPM( void )
         return (-1);
     }
 
-	rpmPinGPIO = wpiPinToGpio(rpmPin);
+	RPM_PIN_GPIO = wpiPinToGpio(RPM_PIN);
 
-    pullUpDnControl (rpmPin, PUD_UP);
-    if ( wiringPiISR (rpmPin, INT_EDGE_RISING, &interruptCounter) != 0 )
+    pullUpDnControl (RPM_PIN, PUD_UP);
+    if ( wiringPiISR (RPM_PIN, INT_EDGE_RISING, &interruptCounter) != 0 )
     {
         fprintf (stderr, "Unable to setup ISR: %s\n", strerror (errno)) ;
         return (-1) ;
@@ -125,54 +139,74 @@ int setupWiringPiRPM( void )
 
 /*
  *********************************************************************************
- * main
+ * pauseInterruptHandler():
+ * Pause and restart the InterruptHandler to save Performance, when not active
+ * measuring.
  *********************************************************************************
  */
+void pauseInterruptHandler(int pause)
+{
 
+	char cmd[50];
+    if ( pause == 0 )
+    {
+    	sprintf (cmd, "/usr/local/bin/gpio edge %d none", RPM_PIN_GPIO);
+    	system (cmd);
+    }
+    else
+    {
+    	sprintf (cmd, "/usr/local/bin/gpio edge %d rising", RPM_PIN_GPIO);
+    	system (cmd);
+    }
+
+}
+
+
+/*
+ *********************************************************************************
+ * getRpm():
+ * get current Fan rpm
+ *********************************************************************************
+ */
 int getRpm( void )
 {
 
-    if (initRPM == 0 && setupWiringPiRPM() != 0)
+    if (INIT_RPM == 0 && setupWiringPiRPM() != 0)
     {
       fprintf (stderr, "RPM setup Failed\n") ;
       exit (EXIT_FAILURE) ;
     }else{
-    	sprintf (cmd, "/usr/local/bin/gpio edge %d rising", rpmPinGPIO);
-    	system (cmd);
+    	pauseInterruptHandler(0);
     }
 
-    initRPM = 1;
+    INIT_RPM = 1;
 
-	double maxTimePerTick = (60 * 1000) / (ticksPerRotation * 500);
-    double timeLimit      = (double)testInterval * maxTimePerTick ;
+	double maxTimePerTick = (60 * 1000) / (TICKS_PER_ROTATION * 500);
+    double timeLimit      = (double)TEST_INTERVAL * maxTimePerTick ;
     long rpm              = 0 ;
     struct timeval before, after;
 
-    globalCounter =  0;
+    COUNTER =  0;
 
     gettimeofday(&before , NULL);
 
-    while (globalCounter < testInterval)
+    while (COUNTER < TEST_INTERVAL)
     {
     	gettimeofday(&after , NULL);
         if( time_diff(before, after) > timeLimit )
         {
-        	//fprintf (stderr, "Counting to %d Ticks took longer then %.2fms. Abort after %.2fms\n", testInterval, timeLimit, time_diff(before, after));
-            return( -1 );
+        	pauseInterruptHandler(1);
+        	return( -1 );
         }
         delay(75);
     }
 
-    ticks = globalCounter;
+    TICKS = COUNTER;
     gettimeofday(&after , NULL);
 
-	sprintf (cmd, "/usr/local/bin/gpio edge %d none", rpmPinGPIO);
-	system (cmd);
-	//system (sprintf("/usr/local/bin/gpio edge %d none", rpmPinGPIO));
+	pauseInterruptHandler(1);
 
-    rpm = ( ticks / ticksPerRotation ) * ( (1000 * 60) / time_diff(before, after));
-
-    //fprintf (stderr, "ticks: %d  ticksPerRotation: %dms. time_diff: %.2fms\n", ticks, ticksPerRotation, time_diff(before, after));
+    rpm = ( TICKS / TICKS_PER_ROTATION ) * ( (1000 * 60) / time_diff(before, after));
 
     return( (int)rpm );
 }

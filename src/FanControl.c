@@ -12,43 +12,113 @@
 #include <unistd.h>
 #include "fan-pwm.h"
 
+void signal_callback_handler(int signum);
+int setup( void );
+int main();
+
+
+/*
+ *********************************************************************************
+ * signal_callback_handler():
+ * handle signals to turn off fan before ending the programm
+ *********************************************************************************
+ */
 void signal_callback_handler(int signum)
 {
-   printf("\nCaught signal %d\n",signum);
-   updateFanPWM(0);
-   exit(signum);
+   updateFanPWM ( 0 );
+   printf("Fan stopped, exiting.. \n",signum);
+   exit ( signum );
 }
 
+
+/*
+ *********************************************************************************
+ * setup():
+ * Setup modules, with the values from config.h and set signal handlers
+ *********************************************************************************
+ */
+int setup( void )
+{
+
+	/*
+	if( setPwmPin ( pin ) != 0 ){
+		printf("Setting PWM-pin failed!");
+		exit ( EXIT_FAILURE );
+	}
+	if( setPwmRange ( min, max ) != 0 ){
+		printf("Setting PWM-range failed!");
+		exit ( EXIT_FAILURE );
+	}
+	if( setTempRange ( start, pwm, max ) != 0 ){
+		printf("Setting temprange failed!");
+		exit ( EXIT_FAILURE );
+	}
+	if( setRpmPin ( pin ) != 0 ){
+		printf("Setting RPM-pin failed!");
+		exit ( EXIT_FAILURE );
+	}
+	if( setTicksPerRotation ( ticks ) != 0 ){
+		printf("Ticks per rotation has to be divisible by 2!");
+		exit ( EXIT_FAILURE );
+	}
+	if( setTestInterval ( ticks ) != 0 ){
+		printf("Setting TestInterval failed.");
+		exit ( EXIT_FAILURE );
+	}
+	*/
+	if( signal(SIGINT,  signal_callback_handler) == SIG_ERR ||
+		signal(SIGTERM, signal_callback_handler) == SIG_ERR ||
+		signal(SIGQUIT, signal_callback_handler) == SIG_ERR
+	) {
+		printf("Binding signal handlers failed!");
+		exit ( EXIT_FAILURE );
+	}
+
+	return ( 0 );
+
+}
+
+
+/*
+ *********************************************************************************
+ * main():
+ * The main loop of this program
+ *********************************************************************************
+ */
 int main()
 {
 
-	signal(SIGINT, signal_callback_handler);
-	signal(SIGTERM, signal_callback_handler);
-	signal(SIGKILL, signal_callback_handler);
+	if( getuid() != 0 )
+	{
+		printf("You must be root to run this app\n");
+		exit ( EXIT_FAILURE );
+	}
 
-	int i = 0;
-	while(1 /*i < 10*/)
+	if( setup() != 0 )
+	{
+		printf("There is an error in your configuration\n");
+		exit ( EXIT_FAILURE );
+	}
+
+	int i    = 0,
+		temp = 0,
+		pwm  = 0,
+		rpm  = 0;
+
+	while( 1 )
 	{
 
-		printf("RUN: %i\t", i);
+		temp = getTemp();
+		pwm  = getNewFanSpeed( temp );
+		rpm  = updateFanPWM( pwm );
 
-		int temp = getTemp();
-		printf("TEMP: %0.2f°C\t", (float) temp/1000);
+		printf("RUN: %i\tTEMP: %0.2f°C\tPWM: %i\tRPM: %i\n", i, (float) temp/1000, pwm, rpm);
 
-		int pwm = getNewFanSpeed( temp );
-		//int pwm = 1024;
-		printf("PWM: %i\t", pwm);
-
-		int rpm = updateFanPWM(pwm);
-		printf("RPM: %i\t", rpm);
-
-		printf("\n");
-
-		sleep(5000);
+		sleep(5);
 
 		i++;
 	}
 
-	return ( EXIT_SUCCESS );
+	exit ( EXIT_SUCCESS );
 
 }

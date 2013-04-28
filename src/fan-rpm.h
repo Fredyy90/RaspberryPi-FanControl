@@ -8,9 +8,9 @@
 #ifndef RPM_INTERVAL_H_
 #define RPM_INTERVAL_H_
 
-extern void setRpmPin ( int pin );
-extern void setTicksPerRotation ( int ticks );
-extern void setTestInterval ( int ticks );
+extern int setRpmPin ( int pin );
+extern int setTicksPerRotation ( int ticks );
+extern int setTestInterval ( int ticks );
 extern int getRpm( void );
 
 
