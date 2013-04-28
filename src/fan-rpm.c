@@ -16,7 +16,7 @@
  * Setup variables and default values
  *********************************************************************************
  */
-static volatile int COUNTER            = 0;
+static volatile int INTERRUPT_COUNT    = 0;
 static volatile int RPM_PIN            = 0;
 static volatile int RPM_PIN_GPIO       = 0;
 static volatile int TEST_INTERVAL      = 25;
@@ -40,12 +40,8 @@ int 	getRpm( void );
  */
 int setRpmPin ( int pin )
 {
-	if(pin != 1){
-		return ( 1 );
-	}else{
-		RPM_PIN = pin;
-		return ( 0 );
-	}
+	RPM_PIN = pin;
+	return ( 0 );
 }
 
 
@@ -54,12 +50,12 @@ int setRpmPin ( int pin )
  * setTicksPerRotation():
  *********************************************************************************
  */
-int setTicksPerRotation ( int ticks )
+int setTicksPerRotation ( int ticksPerRotation )
 {
-	if(ticks % 2 != 0){
+	if(ticksPerRotation % 2 != 0){
 		return ( 1 );
 	}else{
-		TICKS_PER_ROTATION = ticks;
+		TICKS_PER_ROTATION = ticksPerRotation;
 		return ( 0 );
 	}
 }
@@ -70,10 +66,10 @@ int setTicksPerRotation ( int ticks )
  * setTestInterval():
  *********************************************************************************
  */
-int setTestInterval ( int ticks )
+int setTestInterval ( int testInterval )
 {
-	TEST_INTERVAL = ticks;
-	return ( 1 );
+	TEST_INTERVAL = testInterval;
+	return ( 0 );
 }
 
 
@@ -85,7 +81,7 @@ int setTestInterval ( int ticks )
  */
 void interruptCounter (void)
 {
-	++COUNTER;
+	INTERRUPT_COUNT++;
 }
 
 
@@ -148,7 +144,7 @@ void pauseInterruptHandler(int pause)
 {
 
 	char cmd[50];
-    if ( pause == 0 )
+    if ( pause == 1 )
     {
     	sprintf (cmd, "/usr/local/bin/gpio edge %d none", RPM_PIN_GPIO);
     	system (cmd);
@@ -173,9 +169,11 @@ int getRpm( void )
 
     if (INIT_RPM == 0 && setupWiringPiRPM() != 0)
     {
-      fprintf (stderr, "RPM setup Failed\n") ;
-      exit (EXIT_FAILURE) ;
-    }else{
+		fprintf (stderr, "RPM setup Failed\n") ;
+		exit (EXIT_FAILURE) ;
+    }
+    else
+    {
     	pauseInterruptHandler(0);
     }
 
@@ -186,11 +184,10 @@ int getRpm( void )
     long rpm              = 0 ;
     struct timeval before, after;
 
-    COUNTER =  0;
-
+    INTERRUPT_COUNT = 0;
     gettimeofday(&before , NULL);
 
-    while (COUNTER < TEST_INTERVAL)
+    while (INTERRUPT_COUNT < TEST_INTERVAL)
     {
     	gettimeofday(&after , NULL);
         if( time_diff(before, after) > timeLimit )
@@ -201,7 +198,7 @@ int getRpm( void )
         delay(75);
     }
 
-    TICKS = COUNTER;
+    TICKS = INTERRUPT_COUNT;
     gettimeofday(&after , NULL);
 
 	pauseInterruptHandler(1);

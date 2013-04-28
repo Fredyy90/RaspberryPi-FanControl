@@ -9,7 +9,6 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <wiringPi.h>
-#include "config.h"
 //#include "../wiringPi/wiringPi/wiringPi.h"
 #include "fan-rpm.h"
 
@@ -56,7 +55,7 @@ int setPwmPin ( int pin )
 /*
  *********************************************************************************
  * setPwmRange():
- * Set min and max Speeed for your Fan. Going lower then ~40% could end in a
+ * Set min and max Speed for your Fan. Going lower then ~40% could end in a
  * stopped fan.
  * 	Scale: 0-1024
  * 	Default values:

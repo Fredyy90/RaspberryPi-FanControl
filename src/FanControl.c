@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include "options.h"
 #include "fan-pwm.h"
+#include "fan-rpm.h"
 
 
 volatile sig_atomic_t g_eflag = 0;
@@ -50,7 +52,8 @@ static void signal_handler(int sig)
  * Setup signal handlers
  *********************************************************************************
  */
-void setup_signal_handler( void ){
+void setup_signal_handler( void )
+{
 
 	if( signal(SIGINT,  signal_handler) == SIG_ERR ||
 		signal(SIGTERM, signal_handler) == SIG_ERR ||
@@ -72,32 +75,30 @@ void setup_signal_handler( void ){
 int setup( void )
 {
 
-	/*
-	if( setPwmPin ( pin ) != 0 ){
+	if( setPwmPin(DEFAULT_PWM_PIN) != 0 ){
 		printf("Setting PWM-pin failed!");
 		exit ( EXIT_FAILURE );
 	}
-	if( setPwmRange ( min, max ) != 0 ){
+	if( setPwmRange ( PWM_RANGE_MIN, PWM_RANGE_MAX ) != 0 ){
 		printf("Setting PWM-range failed!");
 		exit ( EXIT_FAILURE );
 	}
-	if( setTempRange ( start, pwm, max ) != 0 ){
+	if( setTempRange ( TEMP_RANGE_START, TEMP_RANGE_MIN, TEMP_RANGE_MAX ) != 0 ){
 		printf("Setting temprange failed!");
 		exit ( EXIT_FAILURE );
 	}
-	if( setRpmPin ( pin ) != 0 ){
+	if( setRpmPin ( DEFAULT_RPM_PIN ) != 0 ){
 		printf("Setting RPM-pin failed!");
 		exit ( EXIT_FAILURE );
 	}
-	if( setTicksPerRotation ( ticks ) != 0 ){
+	if( setTicksPerRotation ( TICKS_PER_ROTATION ) != 0 ){
 		printf("Ticks per rotation has to be divisible by 2!");
 		exit ( EXIT_FAILURE );
 	}
-	if( setTestInterval ( ticks ) != 0 ){
+	if( setTestInterval ( MAX_TEST_INTERVAL ) != 0 ){
 		printf("Setting TestInterval failed.");
 		exit ( EXIT_FAILURE );
 	}
-	*/
 
 	return ( 0 );
 
@@ -126,7 +127,7 @@ int main()
 		pwm  = 0,
 		rpm  = 0;
 
-	while ( !g_eflag )
+	while (!g_eflag)
 	{
 
         if(g_hupflag)
