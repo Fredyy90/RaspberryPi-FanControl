@@ -12,22 +12,54 @@
 #include <unistd.h>
 #include "fan-pwm.h"
 
-void signal_callback_handler(int signum);
+
+volatile sig_atomic_t g_eflag = 0;
+volatile sig_atomic_t g_hupflag = 1;
+
+
+static void signal_handler(int sig);
+void setup_signal_handler( void );
 int setup( void );
 int main();
 
 
 /*
  *********************************************************************************
- * signal_callback_handler():
- * handle signals to turn off fan before ending the programm
+ * signal_handler():
+ * handle signals to end the loop or reload config
  *********************************************************************************
  */
-void signal_callback_handler(int signum)
+static void signal_handler(int sig)
 {
-   updateFanPWM ( 0 );
-   printf("Fan stopped, exiting.. \n",signum);
-   exit ( signum );
+    switch(sig)
+    {
+    case SIGHUP:
+        g_hupflag = 1;
+        break;
+    case SIGINT:
+    case SIGTERM:
+        g_eflag = 1;
+        break;
+    }
+}
+
+
+/*
+ *********************************************************************************
+ * setup():
+ * Setup modules, with the values from config.h and set signal handlers
+ *********************************************************************************
+ */
+void setup_signal_handler( void ){
+
+	if( signal(SIGINT,  signal_handler) == SIG_ERR ||
+		signal(SIGTERM, signal_handler) == SIG_ERR ||
+		signal(SIGQUIT, signal_handler) == SIG_ERR ||
+		signal(SIGPIPE, SIG_IGN) == SIG_ERR
+	) {
+		printf("Binding signal handlers failed!");
+		exit ( EXIT_FAILURE );
+	}
 }
 
 
@@ -66,13 +98,6 @@ int setup( void )
 		exit ( EXIT_FAILURE );
 	}
 	*/
-	if( signal(SIGINT,  signal_callback_handler) == SIG_ERR ||
-		signal(SIGTERM, signal_callback_handler) == SIG_ERR ||
-		signal(SIGQUIT, signal_callback_handler) == SIG_ERR
-	) {
-		printf("Binding signal handlers failed!");
-		exit ( EXIT_FAILURE );
-	}
 
 	return ( 0 );
 
@@ -94,19 +119,26 @@ int main()
 		exit ( EXIT_FAILURE );
 	}
 
-	if( setup() != 0 )
-	{
-		printf("There is an error in your configuration\n");
-		exit ( EXIT_FAILURE );
-	}
+	setup_signal_handler();
 
 	int i    = 0,
 		temp = 0,
 		pwm  = 0,
 		rpm  = 0;
 
-	while( 1 )
+	while ( !g_eflag )
 	{
+
+        if(g_hupflag)
+        {
+
+            g_hupflag = 0;
+            if( setup() != 0 )
+        	{
+        		printf("There is an error in your configuration\n");
+        	}
+
+        }
 
 		temp = getTemp();
 		pwm  = getNewFanSpeed( temp );
@@ -117,7 +149,10 @@ int main()
 		sleep(5);
 
 		i++;
+
 	}
+
+	updateFanPWM ( 0 );
 
 	exit ( EXIT_SUCCESS );
 
