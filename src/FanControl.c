@@ -10,6 +10,11 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "options.h"
 #include "fan-pwm.h"
 #include "fan-rpm.h"
@@ -22,6 +27,7 @@ volatile sig_atomic_t g_hupflag = 1;
 static void signal_handler(int sig);
 void setup_signal_handler( void );
 int setup( void );
+int writeFiles(int pwm, int rpm);
 int main();
 
 
@@ -107,6 +113,33 @@ int setup( void )
 
 /*
  *********************************************************************************
+ * writeFiles(pwm, rpm):
+ * write files to be read by other programs
+ *********************************************************************************
+ */
+int outfile;
+int writeFiles(int pwm, int rpm)
+{
+
+	char tmp[12]={0x0};
+
+	outfile = open("/dev/fan/rpm", O_WRONLY|O_CREAT|O_TRUNC, 0644);	/*create the new file */
+	sprintf(tmp,"%d\n", rpm);
+	write(outfile, tmp, sizeof(tmp)); 								/*write the rpm to the file */
+	close(outfile); 										/*close the file */
+
+	outfile = open("/dev/fan/pwm", O_WRONLY|O_CREAT|O_TRUNC, 0644);	/*create the new file */
+	sprintf(tmp,"%d\n", pwm);
+	write(outfile, tmp, sizeof(tmp)); 								/*write the rpm to the file */
+	close(outfile); 										/*close the file */
+
+	return ( 0 );
+
+}
+
+
+/*
+ *********************************************************************************
  * main():
  * The main loop of this program
  *********************************************************************************
@@ -145,6 +178,8 @@ int main()
 		pwm  = getNewFanSpeed( temp );
 		rpm  = updateFanPWM( pwm );
 
+		writeFiles(pwm, rpm);
+
 		printf("RUN: %i\tTEMP: %0.2f°C\tPWM: %i\tRPM: %i\n", i, (float) temp/1000, pwm, rpm);
 
 		sleep(5);
@@ -154,6 +189,7 @@ int main()
 	}
 
 	updateFanPWM ( 0 );
+	writeFiles(0, 0);
 
 	exit ( EXIT_SUCCESS );
 

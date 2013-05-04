@@ -33,7 +33,7 @@ int DEFAULT_RPM_PIN = 0;
  * 		PWM_RANGE_MAX: 1024 (100% of maximum Fanspeed)
  *********************************************************************************
  */
-int PWM_RANGE_MIN    = 550;
+int PWM_RANGE_MIN    = 450;
 int PWM_RANGE_MAX    = 1024;
 
 

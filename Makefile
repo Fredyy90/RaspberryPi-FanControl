@@ -21,7 +21,7 @@ PREFIX   = /local
 ###############################################################################
 
 SRCS     := $(foreach dir, $(SRCDIR), $(notdir $(wildcard $(dir)/*.c)))
-INCLUDES := $(addprefix $(SRCDIR)/, $(foreach dir, $(SRCDIR), $(notdir $(wildcard $(dir)/*.h))))
+INCLUDES :=  $(addprefix -include, $(addprefix $(SRCDIR)/, $(foreach dir, $(SRCDIR), $(notdir $(wildcard $(dir)/*.h)))))
 OBJS     := $(addprefix $(OBJDIR)/, $(patsubst %.c, %.o, $(SRCS)))
 TBIN      = $(addprefix $(BINDIR)/, $(TARGET))
 DESTPATH  = $(DESTDIR)$(PREFIX)
@@ -59,7 +59,7 @@ install: all install-wiringPI
 .PHONY: clean
 clean: clean-wiringPI
 		@$(RM) $(OBJS)
-		@echo "Cleaning up \"$(OBJDIR)" complete!\"
+		@echo "Cleaning up \"$(OBJDIR)\" complete!"
 
 
 .PHONY: dist-clean
