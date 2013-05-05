@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <wiringPi.h>
 
 #include "options.h"
@@ -66,7 +67,7 @@ void setup_signal_handler( void )
 		signal(SIGQUIT, signal_handler) == SIG_ERR ||
 		signal(SIGPIPE, SIG_IGN) == SIG_ERR
 	) {
-		printf("Binding signal handlers failed!");
+		printf("Binding signal handlers failed!\n");
 		exit ( EXIT_FAILURE );
 	}
 }
@@ -83,33 +84,33 @@ int setup( void )
 
     if ( wiringPiSetup() != 0 )
     {
-        fprintf (stderr, "Unable to setup wiringPi: %s\n", strerror (errno)) ;
+        printf ("Unable to setup wiringPi\n") ;
         return (-1);
     }
 	//mcp23017Setup (I2C_PINBASE, I2C_ADDRESS) ;
 
 	if( setPwmPin(DEFAULT_PWM_PIN) != 0 ){
-		printf("Setting PWM-pin failed!");
+		printf("Setting PWM-pin failed!\n");
 		exit ( EXIT_FAILURE );
 	}
 	if( setPwmRange ( PWM_RANGE_MIN, PWM_RANGE_MAX ) != 0 ){
-		printf("Setting PWM-range failed!");
+		printf("Setting PWM-range failed!\n");
 		exit ( EXIT_FAILURE );
 	}
 	if( setTempRange ( TEMP_RANGE_START, TEMP_RANGE_MIN, TEMP_RANGE_MAX ) != 0 ){
-		printf("Setting temprange failed!");
+		printf("Setting temprange failed!\n");
 		exit ( EXIT_FAILURE );
 	}
 	if( setRpmPin ( DEFAULT_RPM_PIN ) != 0 ){
-		printf("Setting RPM-pin failed!");
+		printf("Setting RPM-pin failed!\n");
 		exit ( EXIT_FAILURE );
 	}
 	if( setTicksPerRotation ( TICKS_PER_ROTATION ) != 0 ){
-		printf("Ticks per rotation has to be divisible by 2!");
+		printf("Ticks per rotation has to be divisible by 2!\n");
 		exit ( EXIT_FAILURE );
 	}
 	if( setTestInterval ( MAX_TEST_INTERVAL ) != 0 ){
-		printf("Setting TestInterval failed.");
+		printf("Setting TestInterval failed.\n");
 		exit ( EXIT_FAILURE );
 	}
 

@@ -36,8 +36,10 @@ int I2C_PINBASE = 0;
  * 		DEFAULT_RPM_PIN: 0 (Choose the pin, that you like best)
  *********************************************************************************
  */
-int DEFAULT_PWM_PIN = I2C_PINBASE + 1;
-int DEFAULT_RPM_PIN = I2C_PINBASE + 0;
+int DEFAULT_PWM_PIN = 1;
+int DEFAULT_RPM_PIN = 0;
+//int DEFAULT_PWM_PIN = I2C_PINBASE + 1;
+//int DEFAULT_RPM_PIN = I2C_PINBASE + 0;
 
 
 /*

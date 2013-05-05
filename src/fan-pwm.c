@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <wiringPi.h>
+#include <softPwm.h>
 //#include "../wiringPi/wiringPi/wiringPi.h"
 #include "fan-rpm.h"
 
