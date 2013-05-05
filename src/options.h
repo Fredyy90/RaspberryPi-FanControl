@@ -11,6 +11,22 @@
 
 /*
  *********************************************************************************
+ *  WiringPI2 i2c MCP23017 setup:
+ *  	http://wiringpi.com/pins/
+ *
+ * 	Default values:
+ * 		DEFAULT_PWM_PIN: 1 (You must NOT alter this pin, since we are using it's
+ * 							hardware PMW-feature)
+ * 		DEFAULT_RPM_PIN: 0 (Choose the pin, that you like best)
+ *********************************************************************************
+ */
+int I2C_ADDRESS = 0x20;
+int I2C_PINBASE = 0;
+//int I2C_PINBASE = 100;
+
+
+/*
+ *********************************************************************************
  *  Pins used for PWM and RPM signal, use wiringPi numbering:
  *  	http://wiringpi.com/pins/
  *
@@ -20,8 +36,8 @@
  * 		DEFAULT_RPM_PIN: 0 (Choose the pin, that you like best)
  *********************************************************************************
  */
-int DEFAULT_PWM_PIN = 1;
-int DEFAULT_RPM_PIN = 0;
+int DEFAULT_PWM_PIN = I2C_PINBASE + 1;
+int DEFAULT_RPM_PIN = I2C_PINBASE + 0;
 
 
 /*
@@ -33,12 +49,12 @@ int DEFAULT_RPM_PIN = 0;
  * 	Scale: 0-1024
  *
  * 	Default values:
- * 		PWM_RANGE_MIN:  550 (~53% of maximum Fanspeed)
- * 		PWM_RANGE_MAX: 1024 (100% of maximum Fanspeed)
+ * 		PWM_RANGE_MIN:  40 (~53% of maximum Fanspeed)
+ * 		PWM_RANGE_MAX: 100 (100% of maximum Fanspeed)
  *********************************************************************************
  */
-int PWM_RANGE_MIN    = 450;
-int PWM_RANGE_MAX    = 1024;
+int PWM_RANGE_MIN    = 40;
+int PWM_RANGE_MAX    = 100;
 
 
 /*

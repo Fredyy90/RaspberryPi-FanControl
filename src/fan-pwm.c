@@ -20,8 +20,8 @@
  *********************************************************************************
  */
 static volatile int PWM_PIN    = 1;
-static volatile int PWM_MIN    = 550;
-static volatile int PWM_MAX    = 1024;
+static volatile int PWM_MIN    = 40;
+static volatile int PWM_MAX    = 100;
 static volatile int TEMP_ZERO  = 35000;
 static volatile int TEMP_PWM   = 40000;
 static volatile int TEMP_MAX   = 60000;
@@ -34,6 +34,7 @@ int setTempRange ( int start, int pwm, int max );
 int getTemp ( void );
 int setupWiringPiPWM ( void );
 int getNewFanSpeed ( int temp );
+int setPWMValue ( int pwm );
 int updateFanPWM ( int pwm );
 
 
@@ -133,15 +134,13 @@ int getTemp( void )
  */
 int setupWiringPiPWM( void )
 {
-
-    if ( wiringPiSetup() != 0 )
-    {
-        fprintf (stderr, "Unable to setup wiringPi: %s\n", strerror (errno)) ;
-        return (-1);
-    }
-
     pullUpDnControl (PWM_PIN, PUD_UP);
-    pinMode (PWM_PIN, PWM_OUTPUT);
+	
+	if(PWM_PIN != 0){
+		softPwmCreate(PWM_PIN, 100, 100);
+	}else{
+		pinMode (PWM_PIN, PWM_OUTPUT);
+	}
 
     return (0);
 }
@@ -181,6 +180,25 @@ int getNewFanSpeed( int temp )
 
 /*
  *********************************************************************************
+ * setPWMValue():
+ * Update PWM Speed
+ *********************************************************************************
+ */
+int setPWMValue( int pwm )
+{
+
+	if(PWM_PIN != 0){
+		softPwmWrite (PWM_PIN, pwm);
+	}else{
+		pwmWrite (PWM_PIN, (int)(pwm * 1024/100));
+	}
+
+    return (0);
+}
+
+
+/*
+ *********************************************************************************
  * updateFanPWM():
  * Set PWM duty cycle to updated value
  *********************************************************************************
@@ -203,14 +221,14 @@ int updateFanPWM( int pwm )
 	}
 	else if (pwm == 0)
 	{
-		pwmWrite (PWM_PIN, pwm);
+		setPWMValue (0);
 		return (0);
 	}
 	else
 	{
-		pwmWrite (PWM_PIN, PWM_MAX);
+		setPWMValue (100);
 		int rpm = getRpm();
-		pwmWrite (PWM_PIN, pwm);
+		setPWMValue (pwm);
 		return (rpm);
 	}
 }
