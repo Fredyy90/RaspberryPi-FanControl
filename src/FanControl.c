@@ -123,12 +123,14 @@ int writeFiles(int pwm, int rpm)
 
 	char tmp[12]={0x0};
 
-	outfile = open("/dev/fan/rpm", O_WRONLY|O_CREAT|O_TRUNC, 0644);	/*create the new file */
+	mkdir("/dev/fan", S_IRWXU);
+
+	outfile = open("/dev/fan/rpm", O_WRONLY|O_CREAT|O_TRUNC, 0766);	/*create the new file */
 	sprintf(tmp,"%d\n", rpm);
 	write(outfile, tmp, sizeof(tmp)); 								/*write the rpm to the file */
 	close(outfile); 										/*close the file */
 
-	outfile = open("/dev/fan/pwm", O_WRONLY|O_CREAT|O_TRUNC, 0644);	/*create the new file */
+	outfile = open("/dev/fan/pwm", O_WRONLY|O_CREAT|O_TRUNC, 0766);	/*create the new file */
 	sprintf(tmp,"%d\n", pwm);
 	write(outfile, tmp, sizeof(tmp)); 								/*write the rpm to the file */
 	close(outfile); 										/*close the file */
