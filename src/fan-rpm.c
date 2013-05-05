@@ -115,13 +115,6 @@ double time_diff(struct timeval x , struct timeval y)
  */
 int setupWiringPiRPM( void )
 {
-
-    if ( wiringPiSetup() != 0 )
-    {
-        fprintf (stderr, "Unable to setup wiringPi: %s\n", strerror (errno)) ;
-        return (-1);
-    }
-
 	RPM_PIN_GPIO = wpiPinToGpio(RPM_PIN);
 
     pullUpDnControl (RPM_PIN, PUD_UP);

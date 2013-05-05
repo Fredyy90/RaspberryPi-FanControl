@@ -80,6 +80,13 @@ void setup_signal_handler( void )
 int setup( void )
 {
 
+    if ( wiringPiSetup() != 0 )
+    {
+        fprintf (stderr, "Unable to setup wiringPi: %s\n", strerror (errno)) ;
+        return (-1);
+    }
+	//mcp23017Setup (I2C_PINBASE, I2C_ADDRESS) ;
+
 	if( setPwmPin(DEFAULT_PWM_PIN) != 0 ){
 		printf("Setting PWM-pin failed!");
 		exit ( EXIT_FAILURE );
