@@ -1,8 +1,8 @@
 /*
- * rpm-interval.h
+ *  fan-rpm.h
  *
  *  Created on: 20.04.2013
- *      Author: frede_000
+ *      Author: Fredyy90 <frederick.behrends@gmail.com>
  */
 
 #ifndef RPM_INTERVAL_H_

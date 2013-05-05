@@ -1,9 +1,10 @@
 /*
- * fan-pwm.h
+ *  fan-pwm.h
  *
  *  Created on: 22.04.2013
- *      Author: frede_000
+ *      Author: Fredyy90 <frederick.behrends@gmail.com>
  */
+
 
 #ifndef FAN_PWM_H_
 #define FAN_PWM_H_

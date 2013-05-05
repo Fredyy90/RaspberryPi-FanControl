@@ -1,6 +1,10 @@
 /*
- * options.h
+ *  options.h
+ *
+ *  Created on: 28.04.2013
+ *      Author: Fredyy90 <frederick.behrends@gmail.com>
  */
+
 #ifndef OPTIONS_H_
 #define OPTIONS_H_
 

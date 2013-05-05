@@ -1,7 +1,10 @@
 /*
- *  rpm-interval.c:
- *  Wait for Interrupt test program - ISR method
+ *  fan-rpm.c
+ *
+ *  Created on: 20.04.2013
+ *      Author: Fredyy90 <frederick.behrends@gmail.com>
  */
+
 
 #include <stdio.h>
 #include <string.h>

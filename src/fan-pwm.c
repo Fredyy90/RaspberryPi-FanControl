@@ -1,9 +1,10 @@
 /*
- * fan-pwm.c
+ *  fan-pwm.c
  *
  *  Created on: 22.04.2013
- *      Author: frede_000
+ *      Author: Fredyy90 <frederick.behrends@gmail.com>
  */
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
