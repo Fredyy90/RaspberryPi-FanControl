@@ -10,7 +10,7 @@ CC       = gcc
 INCLUDE  = -I$(SRCDIR)
 CFLAGS   = $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 
-LDFLAGS  = -L./wiringPi/wiringPi/
+LDFLAGS  = -L./WiringPi2-Python/WiringPi/wiringPi/
 LDLIBS   = -lwiringPi
 
 DESTDIR  = /usr
@@ -75,16 +75,16 @@ dist-clean: clean
 
 .PHONY: wiringPI
 wiringPI:
-		@$(MAKE) -C ./wiringPi/wiringPi/ all
-		@echo "Making \"wiringPi (Dynamic)\" complete!"
+		@$(MAKE) -C ./WiringPi2-Python/WiringPi/wiringPi/ all
+		@echo "Making \"wiringPi2 (Dynamic)\" complete!"
 
 
 .PHONY: clean-wiringPI
 clean-wiringPI:
-		@$(MAKE) -C ./wiringPi/wiringPi/ clean
-		@echo "Cleaning up \"wiringPi\" complete!"
+		@$(MAKE) -C ./WiringPi2-Python/WiringPi/wiringPi/ clean
+		@echo "Cleaning up \"wiringPi2\" complete!"
 
 .PHONY: install-wiringPI
 install-wiringPI:
-		@sudo $(MAKE) -C ./wiringPi/wiringPi/ install
-		@echo "Installing \"wiringPi (Dynamic)\" complete!"
+		@sudo $(MAKE) -C ./WiringPi2-Python/WiringPi/wiringPi/ install
+		@echo "Installing \"wiringPi2 (Dynamic)\" complete!"
