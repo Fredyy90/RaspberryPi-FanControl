@@ -9,21 +9,6 @@
 #define OPTIONS_H_
 
 
-/*
- *********************************************************************************
- *  WiringPI2 i2c MCP23017 setup:
- *  	http://wiringpi.com/pins/
- *
- * 	Default values:
- * 		DEFAULT_PWM_PIN: 1 (You must NOT alter this pin, since we are using it's
- * 							hardware PMW-feature)
- * 		DEFAULT_RPM_PIN: 0 (Choose the pin, that you like best)
- *********************************************************************************
- */
-int I2C_ADDRESS = 0x20;
-int I2C_PINBASE = 0;
-//int I2C_PINBASE = 100;
-
 
 /*
  *********************************************************************************
@@ -31,15 +16,13 @@ int I2C_PINBASE = 0;
  *  	http://wiringpi.com/pins/
  *
  * 	Default values:
- * 		DEFAULT_PWM_PIN: 1 (You must NOT alter this pin, since we are using it's
- * 							hardware PMW-feature)
+ * 		DEFAULT_PWM_PIN: 1 (I recommend you to use Pin 1 since it has
+ *                                                               hardware support)
  * 		DEFAULT_RPM_PIN: 0 (Choose the pin, that you like best)
  *********************************************************************************
  */
 int DEFAULT_PWM_PIN = 1;
 int DEFAULT_RPM_PIN = 0;
-//int DEFAULT_PWM_PIN = I2C_PINBASE + 1;
-//int DEFAULT_RPM_PIN = I2C_PINBASE + 0;
 
 
 /*

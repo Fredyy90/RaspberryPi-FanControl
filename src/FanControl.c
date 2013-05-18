@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+
 #include <wiringPi.h>
 
 #include "options.h"
@@ -87,7 +88,6 @@ int setup( void )
         printf ("Unable to setup wiringPi\n") ;
         return (-1);
     }
-	//mcp23017Setup (I2C_PINBASE, I2C_ADDRESS) ;
 
 	if( setPwmPin(DEFAULT_PWM_PIN) != 0 ){
 		printf("Setting PWM-pin failed!\n");
@@ -198,8 +198,8 @@ int main()
 
 	}
 
-	updateFanPWM ( 0 );
-	writeFiles(0, 0);
+	setPWMValue ( 0 );
+	writeFiles  (0, 0);
 
 	exit ( EXIT_SUCCESS );
 

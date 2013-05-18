@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <wiringPi.h>
 #include <softPwm.h>
-//#include "../wiringPi/wiringPi/wiringPi.h"
 #include "fan-rpm.h"
 
 
@@ -46,12 +45,8 @@ int updateFanPWM ( int pwm );
  */
 int setPwmPin ( int pin )
 {
-	if(pin != 1){
-		return ( 1 );
-	}else{
-		PWM_PIN = pin;
-		return ( 0 );
-	}
+	PWM_PIN = pin;
+	return ( 0 );
 }
 
 
@@ -137,7 +132,7 @@ int setupWiringPiPWM( void )
 {
     pullUpDnControl (PWM_PIN, PUD_UP);
 	
-	if(PWM_PIN != 0){
+	if(PWM_PIN != 1){
 		softPwmCreate(PWM_PIN, 100, 100);
 	}else{
 		pinMode (PWM_PIN, PWM_OUTPUT);
@@ -188,7 +183,7 @@ int getNewFanSpeed( int temp )
 int setPWMValue( int pwm )
 {
 
-	if(PWM_PIN != 0){
+	if(PWM_PIN != 1){
 		softPwmWrite (PWM_PIN, pwm);
 	}else{
 		pwmWrite (PWM_PIN, (int)(pwm * 1024/100));
