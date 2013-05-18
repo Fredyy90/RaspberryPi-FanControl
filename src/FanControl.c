@@ -14,7 +14,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+
 #include <wiringPi.h>
+//#include <mcp23017.h>
 
 #include "options.h"
 #include "fan-pwm.h"
@@ -198,8 +200,8 @@ int main()
 
 	}
 
-	updateFanPWM ( 0 );
-	writeFiles(0, 0);
+	setPWMValue ( 0 );
+	writeFiles  (0, 0);
 
 	exit ( EXIT_SUCCESS );
 

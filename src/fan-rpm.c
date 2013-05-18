@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <wiringPi.h>
-//#include "../wiringPi/wiringPi/wiringPi.h"
 
 /*
  *********************************************************************************

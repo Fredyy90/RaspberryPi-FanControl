@@ -7,10 +7,10 @@ BINDIR   = .
 #DEBUG  = -g -O0
 DEBUG    = -O3
 CC       = gcc
-INCLUDE  = -I$(SRCDIR)
+INCLUDE  = -I$(SRCDIR) -I./wiringPi/wiringPi/
 CFLAGS   = $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 
-LDFLAGS  = -L./WiringPi2-Python/WiringPi/wiringPi/
+LDFLAGS  = -L./wiringPi/wiringPi/
 LDLIBS   = -lwiringPi
 
 DESTDIR  = /usr
@@ -21,7 +21,7 @@ PREFIX   = /local
 ###############################################################################
 
 SRCS     := $(foreach dir, $(SRCDIR), $(notdir $(wildcard $(dir)/*.c)))
-INCLUDES :=  $(addprefix -include, $(addprefix $(SRCDIR)/, $(foreach dir, $(SRCDIR), $(notdir $(wildcard $(dir)/*.h)))))
+INCLUDES := $(addprefix -include, $(addprefix $(SRCDIR)/, $(foreach dir, $(SRCDIR), $(notdir $(wildcard $(dir)/*.h)))))
 OBJS     := $(addprefix $(OBJDIR)/, $(patsubst %.c, %.o, $(SRCS)))
 TBIN      = $(addprefix $(BINDIR)/, $(TARGET))
 DESTPATH  = $(DESTDIR)$(PREFIX)
@@ -75,16 +75,16 @@ dist-clean: clean
 
 .PHONY: wiringPI
 wiringPI:
-		@$(MAKE) -C ./WiringPi2-Python/WiringPi/wiringPi/ all
-		@echo "Making \"wiringPi2 (Dynamic)\" complete!"
+		@$(MAKE) -C ./wiringPi/wiringPi/ all
+		@echo "Making \"wiringPi2\" complete!"
 
 
 .PHONY: clean-wiringPI
 clean-wiringPI:
-		@$(MAKE) -C ./WiringPi2-Python/WiringPi/wiringPi/ clean
+		@$(MAKE) -C ./wiringPi/build xclean
 		@echo "Cleaning up \"wiringPi2\" complete!"
 
 .PHONY: install-wiringPI
 install-wiringPI:
-		@sudo $(MAKE) -C ./WiringPi2-Python/WiringPi/wiringPi/ install
-		@echo "Installing \"wiringPi2 (Dynamic)\" complete!"
+		./wiringPi/build
+		@echo "Installing \"wiringPi2\" complete!"

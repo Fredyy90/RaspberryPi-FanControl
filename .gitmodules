@@ -1,3 +1,3 @@
-[submodule "WiringPi2-Python"]
-	path = WiringPi2-Python
-	url = git://github.com/Gadgetoid/WiringPi2-Python.git
+[submodule "wiringPi"]
+	path = wiringPi
+	url = git://git.drogon.net/wiringPi
